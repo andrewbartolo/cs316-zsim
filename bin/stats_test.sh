@@ -90,8 +90,8 @@ MEM_WR=`grep -w wr zsim.out | awk '{print $2}' | paste -sd+ | bc`
 #MEM_STA_ENERGY=`echo "50.63 / 1000 * $TIME" | bc -l`
 
 #echo "python /afs/ir/class/cs316/pa2/bin/mem.py $DRAM_TECH $MEM_RD $MEM_WR $TIME"
-MEM_DYN_ENERGY=`python /afs/ir/class/cs316/pa1/bin/mem.py $DRAM_TECH $MEM_RD $MEM_WR $TIME false`
-MEM_STA_ENERGY=`python /afs/ir/class/cs316/pa1/bin/mem.py $DRAM_TECH $MEM_RD $MEM_WR $TIME true`
+MEM_DYN_ENERGY=`python /file0/bartolo/CS316/cs316/pa1/bin/mem.py $DRAM_TECH $MEM_RD $MEM_WR $TIME false`
+MEM_STA_ENERGY=`python /file0/bartolo/CS316/cs316/pa1/bin/mem.py $DRAM_TECH $MEM_RD $MEM_WR $TIME true`
 
 TOTAL_ENERGY=`echo $CORE_DYN_ENERGY+$CORE_STA_ENERGY+$L1_DYN_ENERGY+$L1_STA_ENERGY+$L2_DYN_ENERGY+$L2_STA_ENERGY+$L3_DYN_ENERGY+$L3_STA_ENERGY+$MEM_DYN_ENERGY+$MEM_STA_ENERGY | bc -l`
 EDP=`echo $TOTAL_ENERGY*$TIME | bc -l`

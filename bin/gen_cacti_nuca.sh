@@ -2,7 +2,7 @@
 #Tahrina Ahmed (tahrina@cs.stanford.ed)
 #cacti run script for CS316 Winter 17-18
 
-CACTI=/afs/ir/class/cs316/pa1/cacti65/cacti
+CACTI=/file0/bartolo/CS316/cs316/pa1/cacti65/cacti
 
 set -e
 

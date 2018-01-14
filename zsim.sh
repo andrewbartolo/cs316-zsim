@@ -42,9 +42,9 @@ EOF
 JSUB_ARGS="-I"
 
 APPLICATION=""
-APP_PATH="/afs/ir/class/cs316/pa1/zsim-apps/build/parsec"
+APP_PATH="/file0/bartolo/CS316/cs316/pa1/zsim-apps/build/parsec"
 
-MAIN_PATH=/afs/ir/class/cs316/pa1
+MAIN_PATH=/file0/bartolo/CS316/cs316/pa1
 
 ## default
 CORES=8
@@ -353,4 +353,5 @@ export OMP_NUM_THREADS=$THREADS
 # <core type> <core voltage> <total area>
 echo "$BINARY $CORE_VOLTAGE $TOTAL_AREA $L3SIZE $L3REPL $MEMRANKS $MEMTECH $APPLICATION" > stats_args.txt
 
-/afs/ir/class/cs316/pa1/zsim_github/build/opt/zsim zsim.cfg; /afs/ir/class/cs316/pa1/bin/stats.sh | tee stats.txt
+#/afs/ir/class/cs316/pa1/zsim_github/build/opt/zsim zsim.cfg; /afs/ir/class/cs316/pa1/bin/stats.sh | tee stats.txt
+/file0/bartolo/CS316/zsim_github/build/opt/zsim zsim.cfg; /file0/bartolo/CS316/cs316/pa1/bin/stats.sh | tee stats.txt
