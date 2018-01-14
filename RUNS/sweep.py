@@ -14,15 +14,20 @@ import subprocess
 # L1: 128K; L2: 512K; L3: 4096K
 
 # Defaults: L1: 32K; L2: 512K; L3: 8192K
+# (2, 8, 16)-way
 
 #####
 
 # Gonna define these up here, and then use throughout
 L1S = 32
-L2S = 512
+L2S = 256
 L3S = 8192
 
-L3P = 'Rand'
+L1W = 2
+L2W = 8
+L3W = 16
+
+L3P = 'LRU'
 L3M = 'nuca'
 
 #####
@@ -51,8 +56,6 @@ def ShortName(l1size, l1ways, l2size, l2ways, l3size, l3ways, l3repl, l3model):
     return str(l1size) + '-' + str(l1ways) + '-' + str(l2size) + '-' + str(l2ways) + '-' + str(l3size) + '-' + str(l3ways) + '-' + l3repl + '-' + l3model
 
 COMBINED_SCRIPT = '/file0/bartolo/CS316/cs316/pa1/zsim.sh'
-# Not currently used
-MAX_CONCURRENT_JOBS = 8
 
 #apps = ['blackscholes', 'ferret', 'streamcluster', 'swaptions', 'art', 'mix']
 # ferret is currently broken
@@ -67,10 +70,8 @@ print("Beginning zsim parameter sweep...")
 pipes = []
 folderNames = []
 for app in apps:
-    # TODO
-    # TODO parameterize args (ways)
-    pipes.append(subprocess.Popen(Sim(app, L1S, 2, L2S, 8, L3S, 16, L3P, L3M)))
-    folderNames.append(FolderName(app, L1S, 2, L2S, 8, L3S, 16, L3P, L3M))
+    pipes.append(subprocess.Popen(Sim(app, L1S, L1W, L2S, L2W, L3S, L3W, L3P, L3M)))
+    folderNames.append(FolderName(app, L1S, L1W, L2S, L2W, L3S, L3W, L3P, L3M))
 
 print("Sim batch complete; aggregating stats...")
 #sys.exit(0)
@@ -89,10 +90,9 @@ for f in folderNames:
          print(time)
          sumTimes = sumTimes + time
 
-# TODO parameterize args (ways)
-sn = ShortName(L1S, 2, L2S, 8, L3S, 16, L3P, L3M)
-print("Total runtime for %s was %f." % (sn, sumTimes))
 # Write a the single sum line to a file
+sn = ShortName(L1S, L1W, L2S, L2W, L3S, L3W, L3P, L3M)
+print("Total runtime for %s was %f." % (sn, sumTimes))
 with open('TOTALS/' + sn, 'w') as f:
     f.write(str(sumTimes) + '\n')
 
