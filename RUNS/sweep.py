@@ -19,18 +19,26 @@ import subprocess
 #####
 
 # Gonna define these up here, and then use throughout
-L1S = 32
+L1S = 8
 L2S = 256
-L3S = 8192
+L3S = 8192 #8192
 
-L1W = 2
+L1W = 1
 L2W = 8
-L3W = 16
+L3W = 32
 
 L3P = 'LRU'
-L3M = 'nuca'
+L3M = 'uca'
 
 #####
+
+COMBINED_SCRIPT = '/file0/bartolo/CS316/cs316/pa1/zsim.sh'
+
+# ferret is currently broken
+apps = ['blackscholes', 'streamcluster', 'swaptions', 'art', 'mix']
+l3repls = ['LRU', 'NRU', 'Rand']
+l3models = ['uca', 'nuca']
+
 
 '''
 Example command:
@@ -44,6 +52,12 @@ Example command:
 def Sim(app, l1size, l1ways, l2size, l2ways, l3size, l3ways, l3repl, l3model):
      return [COMBINED_SCRIPT, '-a', app, '-t', '8', '--l1size', str(l1size),'--l1ways', str(l1ways), '--l2size', str(l2size), '--l2ways', str(l2ways), '--l3size', str(l3size), '--l3ways', str(l3ways), '--l3repl', l3repl, '--l3model', l3model]
 
+# Wrapper to validate a config
+# TODO: dedup w/Sim()
+# TODO: validating requires app parameter; same result for all apps?
+def Validate(l1size, l1ways, l2size, l2ways, l3size, l3ways, l3repl, l3model):
+     return [COMBINED_SCRIPT, '-S', '-a', apps[0], '-t', '8', '--l1size', str(l1size),'--l1ways', str(l1ways), '--l2size', str(l2size), '--l2ways', str(l2ways), '--l3size', str(l3size), '--l3ways', str(l3ways), '--l3repl', l3repl, '--l3model', l3model]
+
 def FolderName(app, l1size, l1ways, l2size, l2ways, l3size, l3ways, l3repl, l3model):
      '''
      Example:
@@ -52,20 +66,26 @@ def FolderName(app, l1size, l1ways, l2size, l2ways, l3size, l3ways, l3repl, l3mo
      return app + '_wide_8_8_2000_L1_' + str(l1size) + '_' + str(l1ways) + '_uca_L2_' + str(l2size) + '_' + str(l2ways) + '_uca_L3_' + str(l3size) + '_' + str(l3ways) + '_' + l3repl + '_' + l3model + '_MEMRANKS_2_DDR3-1066-CL8'
 
 # Returns a short info string for the config (across all apps)
+# TODO convert to '-'.join() (cleaner)
 def ShortName(l1size, l1ways, l2size, l2ways, l3size, l3ways, l3repl, l3model):
     return str(l1size) + '-' + str(l1ways) + '-' + str(l2size) + '-' + str(l2ways) + '-' + str(l3size) + '-' + str(l3ways) + '-' + l3repl + '-' + l3model
 
-COMBINED_SCRIPT = '/file0/bartolo/CS316/cs316/pa1/zsim.sh'
-
-#apps = ['blackscholes', 'ferret', 'streamcluster', 'swaptions', 'art', 'mix']
-# ferret is currently broken
-apps = ['blackscholes', 'streamcluster', 'swaptions', 'art', 'mix']
-l3repls = ['LRU', 'NRU', 'Rand']
-l3models = ['uca', 'nuca']
-
-
+if os.path.isfile('TOTALS/' + ShortName(L1S, L1W, L2S, L2W, L3S, L3W, L3P, L3M)):
+    print("You've already evaluated that configuration!")
+    print("Check the TOTALS directory.")
+    sys.exit(0)
 
 print("Beginning zsim parameter sweep...")
+
+# Should be synchronous. Prints to stdout by default.
+valid = os.system(' '.join(Validate(L1S, L1W, L2S, L2W, L3S, L3W, L3P, L3M)))
+
+if (valid != 0):
+     print("CACTI validation error; exiting...")
+     sys.exit(0)
+else:
+     print("CACTI validation complete.")
+
 
 pipes = []
 folderNames = []
@@ -73,12 +93,11 @@ for app in apps:
     pipes.append(subprocess.Popen(Sim(app, L1S, L1W, L2S, L2W, L3S, L3W, L3P, L3M)))
     folderNames.append(FolderName(app, L1S, L1W, L2S, L2W, L3S, L3W, L3P, L3M))
 
-print("Sim batch complete; aggregating stats...")
-#sys.exit(0)
-
 for p in pipes:
     p.wait()
     #pass
+
+print("Sim batch complete; aggregating stats...")
 
 sumTimes = 0.0
 for f in folderNames:
